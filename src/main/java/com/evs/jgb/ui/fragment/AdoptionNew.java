@@ -56,7 +56,7 @@ public class AdoptionNew extends Fragment {
         textDashboardThree.setText("Provider Search");
         textDashboardFour.setText("Resources");
 
-        dashboardImageOne.setImageResource(R.drawable.note1);git init
+        dashboardImageOne.setImageResource(R.drawable.note1);
         dashboardImageTwo.setImageResource(R.drawable.music);
         dashboardImageThree.setImageResource(R.drawable.study);
         dashboardImageFour.setImageResource(R.drawable.note2);
