@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">JGB</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="ok">Ok</string>
+    <string name="copyright">&#169; 2020 Jorgensen Brooks Group. \nAll Rights Reserved.</string>
+    <string name="search_article">Search article here&#8230;</string>
+    <string name="search_audio">Search audio here&#8230;</string>
+    <string name="search_eLearning">Search eLearning here&#8230;</string>
+    <string name="search_online_seminar">Search online seminar here&#8230;</string>
+    <string name="search_online_resources">Search online resources here&#8230;</string>
+    <string-array name="Parenting">
+        <item> Parenting</item>
+        <item> Aging</item>
+        <item> Balancing</item>
+        <item> Thriving</item>
+        <item> Working</item>
+        <item> Living</item>
+    </string-array>
+
+    <string name="home">Home</string>
+    <string name="parenting">Parenting</string>
+    <string name="aging">Aging</string>
+    <string name="balancing">Balancing</string>
+    <string name="thriving">Thriving</string>
+    <string name="working">Working</string>
+    <string name="living">Living</string>
+    <string name="international">International</string>
+    <string name="help">Help</string>
+    <string name="logout">Logout</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_use">Terms Of Use</string>
+
+</resources>

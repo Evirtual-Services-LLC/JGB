@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="normal"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/d_din_font"
+        android:id="@+id/privacyPolicy"
+        android:padding="10dp"
+
+        android:justificationMode="inter_word"
+        android:lineSpacingExtra="2dp"
+        android:text="private information in accordance with any and all applicable
+laws, regulations and standards, including without limitation
+any standards established in the United States under the
+Health Insurance Portability and Accountability Act and in
+the United Kingdom under the Data Protection Act of 1998.\n\n
+
+private information in accordance with any and all applicable
+laws, regulations and standards, including without limitation
+any standards established in the United States under the
+Health Insurance Portability and Accountability Act and in
+the United Kingdom under the Data Protection Act of 1998.\n\n
+
+private information in accordance with any and all applicable
+laws, regulations and standards, including without limitation
+any standards established in the United States under the
+Health Insurance Portability and Accountability Act and in
+the United Kingdom under the Data Protection Act of 1998.\n\n
+"
+        />
+
+    </ScrollView>
+
+</RelativeLayout>
