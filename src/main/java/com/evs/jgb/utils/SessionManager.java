@@ -1,6 +1,8 @@
 package com.evs.jgb.utils;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class SessionManager {
 
@@ -53,6 +55,7 @@ public class SessionManager {
     private static String ACCOUNT_TYPE = "ACCOUNT_TYPE";
     private static String BRANCH_NAME = "BRANCH_NAME";
 
+
     public static void savePreference(SharedPreferences prefs, String key, Boolean value) {
         SharedPreferences.Editor e = prefs.edit();
         e.putBoolean(key, value);
@@ -70,13 +73,11 @@ public class SessionManager {
         e.putString(key, value);
         e.apply();
     }
-
     public static void dataclear(SharedPreferences prefs) {
         SharedPreferences.Editor e = prefs.edit();
         e.clear();
         e.apply();
     }
-
     public static void save_check_login(SharedPreferences prefs, Boolean value) {
         SessionManager.savePreference(prefs, SESSION_CHECK_LOGIN, value);
     }
@@ -88,6 +89,7 @@ public class SessionManager {
     public static void save_remember(SharedPreferences prefs, Boolean value) {
         SessionManager.savePreference(prefs, remember, value);
     }
+
 
     public static Boolean get_remember(SharedPreferences prefs) {
         return prefs.getBoolean(remember, false);

@@ -10,7 +10,8 @@
         layout="@layout/toolbar_layout" />
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/welcome_action"
         android:layout_below="@+id/toolbar">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -73,7 +74,7 @@
 
 
             <EditText
-                android:id="@+id/edttxt_email"
+                android:id="@+id/edttxt_pwd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -94,7 +95,7 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/btn_CreateAnAccount"
+            android:id="@+id/btn_access"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

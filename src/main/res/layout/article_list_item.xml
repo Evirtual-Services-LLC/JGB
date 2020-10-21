@@ -6,9 +6,11 @@
 
     <TextView
         android:id="@+id/tv_data"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/d_din_font"
+        android:layout_toLeftOf="@+id/iv_arrow"
+        android:layout_marginRight="@dimen/dp_6"
         android:text="Adjusting to Single Parenthood"
         android:textColor="@color/black"
         android:textSize="18sp"

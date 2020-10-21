@@ -6,10 +6,13 @@
     >
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/listDataText"
         android:textSize="18sp"
+
+        android:layout_toLeftOf="@+id/listDataImg"
+        android:layout_marginRight="@dimen/dp_6"
         android:textColor="@color/black"
         android:fontFamily="@font/d_din_font"
         android:textStyle="bold"
@@ -17,6 +20,7 @@
         />
 
     <ImageView
+
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentRight="true"

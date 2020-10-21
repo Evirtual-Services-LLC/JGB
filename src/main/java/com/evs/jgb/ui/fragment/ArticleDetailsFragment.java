@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,21 +12,45 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.evs.jgb.R;
+import com.evs.jgb.model.parentModel.ArticleModel;
+import com.evs.jgb.retrofit.ApiInterface;
+import com.evs.jgb.retrofit.ApiInterfaceService;
+import com.evs.jgb.retrofit.ListResponse;
+import com.evs.jgb.ui.activity.ArticleDetailsModel;
+import com.evs.jgb.utils.Global;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cc.cloudist.acplibrary.ACProgressFlower;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_ID_CRED;
+import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_ID_MODULE_DESCRP;
+import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
+import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_DIVISION;
+import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_MODULE;
 
 public class ArticleDetailsFragment extends Fragment {
     public static final String BUNDLE_KEY = "key";
     @BindView(R.id.text_toolbar)
     TextView text_toolbar;
+    @BindView(R.id.iv_pdf)
+    ImageView iv_pdf;
     String details;
     @BindView(R.id.textHeading)
     TextView textHeading;
     @BindView(R.id.textDetail)
     TextView textDetail;
-
+    String module_id, devision_id, id_cred, id_module_desc;
+    ACProgressFlower progressDialog;
+    ArrayList<ArticleDetailsModel> list;
+    private ArticleModel articleModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_details, container, false);
@@ -39,49 +64,106 @@ public class ArticleDetailsFragment extends Fragment {
     }
 
     private void intialize() {
+        progressDialog = Global.getProgress(getActivity(), "Please wait...");
         Bundle bundle = getArguments();
         if (bundle != null) {
             details = bundle.getString(BUNDLE_KEY);
+            devision_id = bundle.getString(BUNDLE_ID_DIVISION);
+            module_id = bundle.getString(BUNDLE_ID_MODULE);
+            id_cred = bundle.getString(BUNDLE_ID_CRED);
+            id_module_desc = bundle.getString(BUNDLE_ID_MODULE_DESCRP);
+            String json = bundle.getString(BUNDLE_KEY_DETAILS);
+            articleModel = new Gson().fromJson(json, ArticleModel.class);
 
+            textHeading.setText(articleModel.getTitle());
+            textDetail.setText(articleModel.getBody_combine());
         }
-        if (details.equalsIgnoreCase("PARENTING DETAILS")) {
-            textHeading.setText("Adjusting to Single Parenthood");
-            textDetail.setText("Mothers and fathers that find themselves in the new role of being a single parent have many adjustments to make in their lives. It can often be overwhelming, but there are some things you can do to make the transition easier for both you and your children:" +
-                    "\n\n Give yourself time to adjust to your new role as a single parent and to grieve for the loss of your relationship with your partner. Your children will need time to adjust as well.\n" +
-                    "Do not consider yourself a failure because of a failed relationship. Focus on the positive things about you and your children.\n\n" +
-                    "Make a conscious effort to go forward with your life. Living in the past will not help you. You have to focus on the new life you and your children are now leading.");
-        }else if (details.equalsIgnoreCase("E-LEARNING")) {
-            textHeading.setText("Effective Communication");
-            textDetail.setText("The ability to effectively communicate with others is one of the most powerful" +
-                    " tools for personal and professional success. Most people are challenged by the many day-to-day " +
-                    "interactions with coworkers, family, and friends. Emotion, communication, and conflict are present " +
-                    "in all human interactions and affect each of us in different ways. Everyone manages emotion, communication, " +
-                    "and conflict from habit—patterns and styles developed early in life and over time. In this eLearning" +
-                    " you will learn how to more effectively communicate in both personal and work situations.");
-        }else if (details.equalsIgnoreCase("LEGALFORMS")) {
-            textHeading.setText("Children's Carpool Agreement");
-            textDetail.setText("Documents are saved in rtf (rich text format) so that you can save the text into almost " +
-                    "all versions of any word processor and on any computer operating system. They are provided so that " +
-                    "you can then make changes to the document content if you want to.The files are provided on this Web" +
-                    " site so you can get immediate access to the information. They can be saved on your computer and " +
-                    "viewed with any word processor, including Wordpad, Notepad, Word and Star Office. The files are " +
-                    "named so that they end with the file extension .rtf.");
-        }else if (details.equalsIgnoreCase("ONLINE SEMINAR")) {
-            textHeading.setText("Online Seminar");
-            textDetail.setText("For many people across the world, the annual summer vacation has been canceled, and they" +
-                    " are facing the prospect of staying at home with the family for the holiday season. While this can " +
-                    "feel disappointing and frustrating, there is no need to write off the prospect of a holiday " +
-                    "altogether! Planning the ultimate staycation can help provide that long-awaited downtime with your " +
-                    "family and ensure that everyone gets a chance to have some fun in their own hometown.");
-        }else if (details.equalsIgnoreCase("RESOURCES")) {
+        //getSectionResponse();
+    }
 
-            textHeading.setText("Resources");
-            textDetail.setText("The American Pregnancy Association is a nonprofit, national health organization committed " +
-                    "to promoting reproductive and pregnancy wellness through education, research, advocacy, and community " +
-                    "awareness. It's website provides lots of information about avoiding, planning, and supporting a healthy " +
-                    "pregnancy; reproductive health,birth planning, and much more.");
+//    private void getSectionResponse() {
+//        progressDialog.show();
+//        ApiInterface networkService = ApiInterfaceService.getClient().create(ApiInterface.class);
+//        Call<ListResponse<ArticleDetailsModel>> arrayListCall = networkService.ArticleDetailsModule(devision_id, module_id, id_cred, id_module_desc, "", "",
+//                "en-us", "id_cr,title,body_combine", "title", "asc", "", "", "",
+//                "", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9lYXAiOiIxNjUxIiwiaWRfY29tcGFueSI6MTY1MTI2NTY3fQ.FznzxAPBbFF9kI2Vd6G39P6kO431dztk8TN9VYir-jY",
+//                "1651");
+//        arrayListCall.enqueue(new Callback<ListResponse<ArticleDetailsModel>>() {
+//            @Override
+//            public void onResponse(@NonNull Call<ListResponse<ArticleDetailsModel>> call, @NonNull Response<ListResponse<ArticleDetailsModel>> response) {
+//                progressDialog.dismiss();
+//                if (!response.isSuccessful()) {
+//                    switch (response.code()) {
+//                        case 404:
+//                            Global.showToast(getActivity(), "not found");
+//                            break;
+//                        case 500:
+//                            Global.showToast(getActivity(), "server broken");
+//                            break;
+//                        default:
+//                            Global.showToast(getActivity(), "unknown error");
+//
+//                    }
+//                }
+//                ListResponse<ArticleDetailsModel> loginResponse = response.body();
+//                list = new ArrayList<>();
+//                list = loginResponse.getList();
+//
+//                for (int i = 0; i < list.size(); i++) {
+//                    textHeading.setText(list.get(i).getTitle());
+//                    textDetail.setText(list.get(i).getBody_combine());
+//                }
+//
+//
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<ListResponse<ArticleDetailsModel>> call, @NonNull Throwable t) {
+//                progressDialog.dismiss();
+////                login_btn.setClickable(true);
+//            }
+//        });
+//    }
 
-        }
+
+//        if (details.equalsIgnoreCase("PARENTING DETAILS")) {
+//            textHeading.setText("Adjusting to Single Parenthood");
+//            textDetail.setText("Mothers and fathers that find themselves in the new role of being a single parent have many adjustments to make in their lives. It can often be overwhelming, but there are some things you can do to make the transition easier for both you and your children:" +
+//                    "\n\n Give yourself time to adjust to your new role as a single parent and to grieve for the loss of your relationship with your partner. Your children will need time to adjust as well.\n" +
+//                    "Do not consider yourself a failure because of a failed relationship. Focus on the positive things about you and your children.\n\n" +
+//                    "Make a conscious effort to go forward with your life. Living in the past will not help you. You have to focus on the new life you and your children are now leading.");
+//        }else if (details.equalsIgnoreCase("E-LEARNING")) {
+//            textHeading.setText("Effective Communication");
+//            textDetail.setText("The ability to effectively communicate with others is one of the most powerful" +
+//                    " tools for personal and professional success. Most people are challenged by the many day-to-day " +
+//                    "interactions with coworkers, family, and friends. Emotion, communication, and conflict are present " +
+//                    "in all human interactions and affect each of us in different ways. Everyone manages emotion, communication, " +
+//                    "and conflict from habit—patterns and styles developed early in life and over time. In this eLearning" +
+//                    " you will learn how to more effectively communicate in both personal and work situations.");
+//        }else if (details.equalsIgnoreCase("LEGALFORMS")) {
+//            textHeading.setText("Children's Carpool Agreement");
+//            textDetail.setText("Documents are saved in rtf (rich text format) so that you can save the text into almost " +
+//                    "all versions of any word processor and on any computer operating system. They are provided so that " +
+//                    "you can then make changes to the document content if you want to.The files are provided on this Web" +
+//                    " site so you can get immediate access to the information. They can be saved on your computer and " +
+//                    "viewed with any word processor, including Wordpad, Notepad, Word and Star Office. The files are " +
+//                    "named so that they end with the file extension .rtf.");
+//        }else if (details.equalsIgnoreCase("ONLINE SEMINAR")) {
+//            textHeading.setText("Online Seminar");
+//            textDetail.setText("For many people across the world, the annual summer vacation has been canceled, and they" +
+//                    " are facing the prospect of staying at home with the family for the holiday season. While this can " +
+//                    "feel disappointing and frustrating, there is no need to write off the prospect of a holiday " +
+//                    "altogether! Planning the ultimate staycation can help provide that long-awaited downtime with your " +
+//                    "family and ensure that everyone gets a chance to have some fun in their own hometown.");
+//        }else if (details.equalsIgnoreCase("RESOURCES")) {
+//
+//            textHeading.setText("Resources");
+//            textDetail.setText("The American Pregnancy Association is a nonprofit, national health organization committed " +
+//                    "to promoting reproductive and pregnancy wellness through education, research, advocacy, and community " +
+//                    "awareness. It's website provides lots of information about avoiding, planning, and supporting a healthy " +
+//                    "pregnancy; reproductive health,birth planning, and much more.");
+//
+//        }
 //        if (details.equalsIgnoreCase("1")) {
 //            textHeading.setText("Foster Parents Considering Adoption");
 //            textDetail.setText("<b>Differences Between Foster Parenting and Adopting</b>\n" +
@@ -148,16 +230,17 @@ public class ArticleDetailsFragment extends Fragment {
 //                    "changes are made.");
 //        }
 
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         text_toolbar.setText(details);
+        iv_pdf.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.iv_back)
     public void onClick() {
         getActivity().onBackPressed();
+        iv_pdf.setVisibility(View.VISIBLE);
     }
 }

@@ -23,7 +23,11 @@
         android:layout_below="@id/toolbar"
         android:padding="10dp"
         />
-
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_above="@+id/lin_rating"
+    android:layout_below="@+id/textHeading">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,7 +42,7 @@
         android:layout_below="@id/textHeading"
         android:padding="10dp"
         />
-
+</ScrollView>
 <LinearLayout
     android:id="@+id/lin_rating"
     android:layout_width="match_parent"
@@ -57,7 +61,7 @@
 
         android:isIndicator="true"
         android:numStars="5"
-        android:rating="3.5"
+        android:rating="4"
         android:stepSize="0.5" />
 
 </LinearLayout>

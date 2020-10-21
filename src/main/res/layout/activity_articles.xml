@@ -59,7 +59,17 @@
         android:id="@+id/rv_article_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/list_data_adapter"
+        tools:listitem="@layout/article_list_item"
         android:layout_below="@+id/toplayout" />
+    <TextView
+        android:id="@+id/not_found"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="Sorry! No Data Found"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:visibility="gone" />
 
 </RelativeLayout>

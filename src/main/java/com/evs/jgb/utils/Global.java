@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -14,6 +15,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import com.evs.jgb.R;
+
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class Global {
 
@@ -84,6 +88,17 @@ public class Global {
         progressDialog.setMessage(msg);
         progressDialog.setCancelable(false);
         return progressDialog;
+    }
+
+    public static ACProgressFlower getProgress(Context context, String msg) {
+
+
+        ACProgressFlower dialog = new ACProgressFlower.Builder(context)
+                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                .themeColor(Color.WHITE)
+                .text(msg)
+                .fadeColor(Color.DKGRAY).build();
+        return dialog;
     }
 
     public static void msgDialog(Activity ac, String msg) {
@@ -159,7 +174,9 @@ public class Global {
         intent.setData(uri);
         activity.startActivityForResult(intent, 101);
     }
-
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
 
 
 }

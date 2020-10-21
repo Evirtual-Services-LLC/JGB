@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.evs.jgb.R;
 import com.evs.jgb.model.AgingModel;
+import com.evs.jgb.model.SectionModel;
+import com.evs.jgb.model.parentModel.ParentModel;
 import com.evs.jgb.model.parentModel.ParentingNewModel;
 
 import java.util.ArrayList;
@@ -21,44 +23,45 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AgingAdapter  extends RecyclerView.Adapter<AgingAdapter.MyViewHolder> {
+public class AgingAdapter extends RecyclerView.Adapter<AgingAdapter.MyViewHolder> {
     private Context context;
-    ArrayList<AgingModel> parentModelList = new ArrayList<>();
+    ArrayList<SectionModel> list;
     private OnClickListener listener;
 
-    public AgingAdapter(Context context, ArrayList<AgingModel> items) {
+
+    public AgingAdapter(Context context) {
         this.context = context;
-        this.parentModelList = items;
+        this.list = new ArrayList<>();
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.frag_parenting_item_new, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.frag_parenting_item, parent, false);
         return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.tv_product_name.setText(parentModelList.get(position).getName());
-        if (parentModelList.get(position).getImage() != null)
-            Glide.with(context).load(parentModelList.get(position).getImage()).placeholder(R.drawable.logo).into(holder.iv_items);
+        holder.textHomeOne.setText(list.get(position).getNative_term());
+      //  Glide.with(context).load(list.get(position).getId_module()).placeholder(R.drawable.logo).into(holder.imageHomeOne);
         holder.setOnClickListener(position1 -> {
             if (listener != null) {
                 listener.onClick(this, position1);
             }
         });
+
     }
 
-    public void update(List<AgingModel> category) {
-        this.parentModelList.clear();
-        this.parentModelList.addAll(category);
+    public void update(List<SectionModel> category) {
+        this.list.clear();
+        this.list.addAll(category);
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return parentModelList.size();
+        return list.size();
     }
 
     public void setOnClickListener(OnClickListener listener) {
@@ -69,15 +72,15 @@ public class AgingAdapter  extends RecyclerView.Adapter<AgingAdapter.MyViewHolde
         void onClick(AgingAdapter adapter, int position);
     }
 
-    public AgingModel get(int position) {
-        return parentModelList.get(position);
+    public SectionModel get(int position) {
+        return list.get(position);
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.iv_items)
-        ImageView iv_items;
+//        @BindView(R.id.iv_item)
+//        ImageView imageHomeOne;
         @BindView(R.id.tv_product_name)
-        TextView tv_product_name;
+        TextView textHomeOne;
         private OnClickListener listener;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -102,4 +105,5 @@ public class AgingAdapter  extends RecyclerView.Adapter<AgingAdapter.MyViewHolde
             void onClick(int position);
         }
     }
+
 }

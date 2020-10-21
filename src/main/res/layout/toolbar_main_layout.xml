@@ -43,14 +43,23 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/iv_cart"
+                android:id="@+id/iv_player"
                 android:layout_width="@dimen/dp_45"
                 android:layout_height="@dimen/dp_45"
                 android:padding="@dimen/margin_8"
-
+                android:layout_centerVertical="true"
+                android:visibility="gone"
+                android:layout_marginRight="@dimen/margin_12"
+                android:src="@drawable/ic_music_player"
+                /> <ImageView
+                android:id="@+id/iv_pdf"
+                android:layout_width="@dimen/dp_45"
+                android:layout_height="@dimen/dp_45"
+                android:padding="@dimen/margin_8"
+            android:visibility="gone"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/margin_12"
-                android:src="@drawable/logo"
+                android:src="@drawable/ic_pdf_file"
                 />
 
 

@@ -40,8 +40,8 @@ public class ParentingNewAdapter extends RecyclerView.Adapter<ParentingNewAdapte
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.tv_product_name.setText(parentModelList.get(position).getName());
-        if (parentModelList.get(position).getImage() != null)
-            Glide.with(context).load(parentModelList.get(position).getImage()).placeholder(R.drawable.logo).into(holder.iv_items);
+
+        Glide.with(context).load(parentModelList.get(position).getImage()).placeholder(R.drawable.logo).into(holder.iv_items);
         holder.setOnClickListener(position1 -> {
             if (listener != null) {
                 listener.onClick(ParentingNewAdapter.this, position1);

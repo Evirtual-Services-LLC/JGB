@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,14 +21,18 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.MyViewHolder> {
+public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.MyViewHolder> implements Filterable {
     private Context context;
-    ArrayList<ArticleModel> list = new ArrayList<>();
+    ArrayList<ArticleModel> list, originalData;
     private OnClickListener listener;
+    private ItemFilter mFilter = new ItemFilter();
+    private final Object mLock = new Object();
 
-    public ArticleListAdapter(Context context, ArrayList<ArticleModel> items) {
+    public ArticleListAdapter(Context context) {
         this.context = context;
-        this.list = items;
+        this.list = new ArrayList<>();
+        this.originalData = list;
+        this.list = new ArrayList<>();
     }
 
     @NonNull
@@ -38,12 +44,13 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.tv_product_name.setText(list.get(position).getName());
+        holder.tv_product_name.setText(list.get(position).getTitle());
         holder.setOnClickListener(position1 -> {
             if (listener != null) {
                 listener.onClick(this, position1);
             }
         });
+
     }
 
     public void update(List<ArticleModel> category) {
@@ -61,8 +68,13 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         this.listener = listener;
     }
 
+    public void add(List<ArticleModel> bootData) {
+        this.list.addAll(bootData);
+    }
+
     public interface OnClickListener {
         void onClick(ArticleListAdapter adapter, int position);
+
     }
 
     public ArticleModel get(int position) {
@@ -97,4 +109,50 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         }
     }
 
+    public void filterList(ArrayList<ArticleModel> filteredList) {
+        list = filteredList;
+        notifyDataSetChanged();
+    }
+
+    public Filter getFilter() {
+        return mFilter;
+    }
+
+    private class ItemFilter extends Filter {
+        @Override
+        public CharSequence convertResultToString(Object resultValue) {
+            String str = ((ArticleModel) resultValue).getTitle();
+            return str;
+        }
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            String filterString = constraint.toString().toLowerCase();
+            FilterResults results = new FilterResults();
+            final List<ArticleModel> list = originalData;
+
+            int count = list.size();
+            final ArrayList<ArticleModel> nlist = new ArrayList<>(count);
+            String filterableString;
+
+            for (int i = 0; i < count; i++) {
+                filterableString = (list.get(i).getTitle());
+                if (filterableString.toLowerCase().contains(filterString)) {
+                    nlist.add(list.get(i));
+                }
+            }
+            results.values = nlist;
+            results.count = nlist.size();
+            return results;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            list = (ArrayList<ArticleModel>) results.values;
+            notifyDataSetChanged();
+
+        }
+
+    }
 }

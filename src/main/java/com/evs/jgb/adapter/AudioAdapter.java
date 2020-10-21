@@ -21,12 +21,12 @@ import butterknife.ButterKnife;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.MyViewHolder> {
     private Context context;
-    ArrayList<AudioModel> list = new ArrayList<>();
+    ArrayList<ArticleModel> list;
     private OnClickListener listener;
 
-    public AudioAdapter(Context context, ArrayList<AudioModel> items) {
+    public AudioAdapter(Context context) {
         this.context = context;
-        this.list = items;
+        this.list = new ArrayList<>();
     }
 
     @NonNull
@@ -38,7 +38,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.tv_product_name.setText(list.get(position).getName());
+        holder.tv_product_name.setText(list.get(position).getTitle());
         holder.setOnClickListener(position1 -> {
             if (listener != null) {
                 listener.onClick(this, position1);
@@ -46,7 +46,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.MyViewHolder
         });
     }
 
-    public void update(List<AudioModel> category) {
+    public void update(List<ArticleModel> category) {
         this.list.clear();
         this.list.addAll(category);
         notifyDataSetChanged();
@@ -65,7 +65,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.MyViewHolder
         void onClick(AudioAdapter adapter, int position);
     }
 
-    public AudioModel get(int position) {
+    public ArticleModel get(int position) {
         return list.get(position);
     }
 
@@ -95,5 +95,9 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.MyViewHolder
         public interface OnClickListener {
             void onClick(int position);
         }
+    }
+    public void filterList(ArrayList<ArticleModel> filteredList) {
+        list = filteredList;
+        notifyDataSetChanged();
     }
 }

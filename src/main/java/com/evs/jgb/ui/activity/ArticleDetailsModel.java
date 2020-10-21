@@ -1,20 +1,14 @@
-package com.evs.jgb.model.parentModel;
+package com.evs.jgb.ui.activity;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ArticleModel {
+public class ArticleDetailsModel {
     @SerializedName("id_cr")
     private String id_cr;
     @SerializedName("title")
     private String title;
-    @SerializedName("id_element")
-    private String id_element;
     @SerializedName("body_combine")
     private String body_combine;
-
-    public String getBody_combine() {
-        return body_combine;
-    }
 
     public String getId_cr() {
         return id_cr;
@@ -24,7 +18,7 @@ public class ArticleModel {
         return title;
     }
 
-    public String getId_element() {
-        return id_element;
+    public String getBody_combine() {
+        return body_combine;
     }
 }

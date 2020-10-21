@@ -26,7 +26,6 @@ public class AdoptionNew extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dashboard, container,false);
-
         textDashboardOne = view.findViewById(R.id.textDashboardOne);
         textDashboardTwo = view.findViewById(R.id.textDashboardTwo);
         textDashboardThree = view.findViewById(R.id.textDashboardThree);

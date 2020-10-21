@@ -12,22 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.evs.jgb.R;
+import com.evs.jgb.model.SectionModel;
 import com.evs.jgb.model.parentModel.ParentModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ParentListAdapter extends RecyclerView.Adapter<ParentListAdapter.MyViewHolder> {
     private Context context;
-    ArrayList<ParentModel> parentModelList = new ArrayList<>();
+    ArrayList<SectionModel> parentModelList;
     private OnClickListener listener;
 
 
-    public ParentListAdapter(Context context, ArrayList<ParentModel> items) {
+    public ParentListAdapter(Context context) {
         this.context = context;
-        this.parentModelList = items;
+        this.parentModelList = new ArrayList<>();
     }
 
     @NonNull
@@ -39,8 +41,8 @@ public class ParentListAdapter extends RecyclerView.Adapter<ParentListAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.textHomeOne.setText(parentModelList.get(position).getName());
-        Glide.with(context).load(parentModelList.get(position).getImage()).placeholder(R.drawable.logo).into(holder.imageHomeOne);
+        holder.textHomeOne.setText(parentModelList.get(position).getNative_term());
+     //   Glide.with(context).load(parentModelList.get(position).getNative_term()).placeholder(R.drawable.logo).into(holder.imageHomeOne);
         holder.setOnClickListener(position1 -> {
             if (listener != null) {
                 listener.onClick(this, position1);
@@ -49,11 +51,11 @@ public class ParentListAdapter extends RecyclerView.Adapter<ParentListAdapter.My
 
     }
 
-//    public void update(List<ParentModel> category) {
-//        this.parentModelList.clear();
-//        this.parentModelList.addAll(category);
-//        notifyDataSetChanged();
-//    }
+    public void update(List<SectionModel> category) {
+        this.parentModelList.clear();
+        this.parentModelList.addAll(category);
+        notifyDataSetChanged();
+    }
 
     @Override
     public int getItemCount() {
@@ -68,13 +70,13 @@ public class ParentListAdapter extends RecyclerView.Adapter<ParentListAdapter.My
         void onClick(ParentListAdapter adapter, int position);
     }
 
-    public ParentModel get(int position) {
+    public SectionModel get(int position) {
         return parentModelList.get(position);
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.iv_item)
-        ImageView imageHomeOne;
+//        @BindView(R.id.iv_item)
+//        ImageView imageHomeOne;
         @BindView(R.id.tv_product_name)
         TextView textHomeOne;
         private OnClickListener listener;

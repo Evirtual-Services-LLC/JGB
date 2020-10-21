@@ -3,7 +3,7 @@ package com.evs.jgb.model.parentModel;
 public class ParentingNewModel {
     private String id;
     private String name;
-    private String image;
+    private int image;
 
     public String getId() {
         return id;
@@ -21,15 +21,15 @@ public class ParentingNewModel {
         this.name = name;
     }
 
-    public String getImage() {
+    public int getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(int image) {
         this.image = image;
     }
 
-    public ParentingNewModel(String id,String name,String image){
+    public ParentingNewModel(String id,String name,int image){
         this.id=id;
         this.name=name;
         this.image=image;

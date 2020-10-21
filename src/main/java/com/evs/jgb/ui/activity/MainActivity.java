@@ -132,36 +132,39 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        int backStackSize = getSupportFragmentManager().getBackStackEntryCount();
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if (manager.getBackStackEntryCount() > 0) {
-                if (manager.getBackStackEntryCount() == 2) {
-                    mainToolbar.setVisibility(View.VISIBLE);
-
-                }
-                super.onBackPressed();
-            } else {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("");
-                alertDialog.setMessage("Do you really want to Exit?");
-                alertDialog.setPositiveButton("Yes",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        });
-                alertDialog.setNegativeButton("No",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                alertDialog.show();
-
-            }
+        }  else if (backStackSize == 1) {
+        showBottomDialog();
+    } else {
+        if (backStackSize == 2) {
+            mainToolbar.setVisibility(View.VISIBLE);
         }
-
+        super.onBackPressed();
     }
+            }
+
+    private void showBottomDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("");
+        alertDialog.setMessage("Do you really want to Exit?");
+        alertDialog.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+        alertDialog.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        alertDialog.show();
+    }
+
+
+
 
     public void updatedisplay(int position) {
         Fragment fragment = null;
@@ -201,20 +204,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 7:
                 fragment = new International();
-                loadFragment(fragment, true);
+                loadMainFragment(fragment, true);
 
                 break;
             case 8:
                 fragment = new HelpScreen();
-                loadFragment(fragment, true);
+                loadMainFragment(fragment, true);
                 break;
             case 9:
                 fragment = new PrivacyPolicy();
-                loadFragment(fragment, true);
+                loadMainFragment(fragment, true);
                 break;
             case 10:
                 fragment = new TermsOfUse();
-                loadFragment(fragment, true);
+                loadMainFragment(fragment, true);
                 break;
             case 11:
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -233,6 +236,8 @@ public class MainActivity extends AppCompatActivity {
                                 SessionManager.save_remember(prefs, b);
                                 SessionManager.save_emailid(prefs, s);
                                 Intent intent = new Intent(MainActivity.this, WelcomeStarted.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();
 

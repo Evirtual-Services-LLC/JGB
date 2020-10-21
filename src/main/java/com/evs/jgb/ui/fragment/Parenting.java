@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -35,11 +34,18 @@ import com.android.volley.toolbox.Volley;
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.ParentListAdapter;
 import com.evs.jgb.model.ParentReponse;
+import com.evs.jgb.model.SectionModel;
 import com.evs.jgb.model.parentModel.ParentModel;
+import com.evs.jgb.retrofit.ApiInterface;
+import com.evs.jgb.retrofit.ApiInterfaceService;
+import com.evs.jgb.retrofit.ListResponse;
+import com.evs.jgb.ui.activity.LoginActivity;
 import com.evs.jgb.ui.activity.MainActivity;
 import com.evs.jgb.utils.Global;
+import com.evs.jgb.viewModels.AuthListener;
 import com.evs.jgb.viewModels.ParentAuthListner;
 import com.evs.jgb.viewModels.UserViewModel;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,92 +55,106 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cc.cloudist.acplibrary.ACProgressFlower;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class Parenting extends Fragment implements ParentAuthListner {
+import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
 
+public class Parenting extends Fragment {
+    public static final String BUNDLE_ID_DIVISION = "iddivision";
+    public static final String BUNDLE_ID_MODULE = "idModule";
     @BindView(R.id.text_toolbar)
     TextView text_toolbar;
+    @BindView(R.id.not_found)
+    TextView not_found;
+    @BindView(R.id.rv_parent_list)
+    RecyclerView rv_parent_list;
     RelativeLayout layoutParentOne, layoutParentTwo, layoutParentThree;
     TextView textHomeOne, textHomeTwo, textHomeThree;
     ImageView imageHomeOne, imageHomeTwo, imageHomeThree;
-    ProgressDialog progressDialog;
+    ACProgressFlower progressDialog;
     SharedPreferences prefs;
     UserViewModel userViewModel;
     RequestQueue queue;
     ParentListAdapter adapter;
-    RecyclerView rv_parent_list;
-    private ArrayList<ParentModel> list;
+    private ArrayList<SectionModel> list;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_parent, container, false);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
         rv_parent_list = view.findViewById(R.id.rv_parent_list);
         intialize();
         return view;
     }
 
     private void intialize() {
-        list = new ArrayList<>();
-        list.add(new ParentModel("1", "Parenting", ""));
-        list.add(new ParentModel("2", "Adoption", ""));
-        list.add(new ParentModel("3", "Child Care", ""));
-        progressDialog = Global.getProgressDialog(getActivity(), "Please wait...");
+        progressDialog = Global.getProgress(getActivity(), "Please wait...");
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
-
-        adapter = new ParentListAdapter(getActivity(), list);
+        adapter = new ParentListAdapter(getActivity());
+        getSectionResponse();
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
         rv_parent_list.setLayoutManager(manager);
         rv_parent_list.setAdapter(adapter);
         adapter.setOnClickListener((adapter, position) -> {
-            ParentModel model = adapter.get(position);
-            goTonextScreen(position);
+            SectionModel model = adapter.get(position);
+            String devision_id = adapter.get(position).getId_division();
+            String module_id = adapter.get(position).getId_module();
+            goTonextScreen(position, devision_id, module_id, model);
         });
-
-        //  get_list();
-        //  hitApi();
-//        userViewModel.getParentData().observe(getActivity(), new Observer<ArrayList<ParentModel>>() {
+//        if (Global.isOnline(getActivity())) {
+//            userViewModel.hitParentDivision(this);
+//        }
+//        userViewModel.getDivisionData().observe(getActivity(), new Observer<ArrayList<SectionModel>>() {
 //            @Override
-//            public void onChanged(ArrayList<ParentModel> parentModels) {
+//            public void onChanged(ArrayList<SectionModel> addressModels) {
 //                progressDialog.dismiss();
-//                adapter.update(parentModels);
+//                if (addressModels != null && addressModels.size() > 0) {
+//                    adapter.update(addressModels);
+//                } else {
+//                    rv_parent_list.setVisibility(View.GONE);
+//                    not_found.setVisibility(View.VISIBLE);
+//                }
 //            }
 //        });
+
+//        list = new ArrayList<>();
+//        list.add(new ParentModel("1", "Parenting", R.drawable.parent_two));
+//        list.add(new ParentModel("2", "Aging", R.drawable.aging_two));
+//        list.add(new ParentModel("3", "Balancing", R.drawable.balance_two));
+//        list.add(new ParentModel("4", "Thriving", R.drawable.thriving_two));
+//        list.add(new ParentModel("5", "Working", R.drawable.working_two));
+//        list.add(new ParentModel("6", "Living", R.drawable.living_two));
+//        progressDialog = Global.getProgressDialog(getActivity(), "Please wait...");
+//        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
+//
+//        adapter = new ParentListAdapter(getActivity(), list);
+
+
     }
 
-    private void goTonextScreen(int position) {
-        if (position == 0) {
-            Fragment fragment = new ParentingNew();
-            Activity activity = getActivity();
-            if (activity instanceof MainActivity) {
-                ((MainActivity) activity).loadMainFragment(fragment, false);
-            } else {
-                replaceFragment(fragment, fragment.getClass().getSimpleName());
-            }
+    private void goTonextScreen(int position, String devision_id, String module_id, SectionModel model) {
 
-        }else if(position==1){
-            Global.showToast(getActivity(),"Feature Coming Soon.. Check back Later!");
-//            Fragment fragment = new AgingFragment();
-//            Activity activity = getActivity();
-//            if (activity instanceof MainActivity) {
-//                ((MainActivity) activity).loadMainFragment(fragment, false);
-//            } else {
-//                replaceFragment(fragment, fragment.getClass().getSimpleName());
-//            }
-        }else if(position==2) {
-            Global.showToast(getActivity(),"Feature Coming Soon.. Check back Later!");
-//            Fragment fragment = new BalancingFragment();
-//            Activity activity = getActivity();
-//            if (activity instanceof MainActivity) {
-//                ((MainActivity) activity).loadMainFragment(fragment, false);
-//            } else {
-//                replaceFragment(fragment, fragment.getClass().getSimpleName());
-//            }
+        Bundle bundle = new Bundle();
+        Fragment fragment = new ParentingNew();
+        bundle.putString(BUNDLE_ID_DIVISION, devision_id);
+        bundle.putString(BUNDLE_ID_MODULE, module_id);
+        bundle.putString(BUNDLE_KEY_DETAILS, new Gson().toJson(model));
+        fragment.setArguments(bundle);
+        Activity activity = getActivity();
+        if (activity instanceof MainActivity) {
+            ((MainActivity) activity).loadMainFragment(fragment, false);
+        } else {
+            replaceFragment(fragment, fragment.getClass().getSimpleName());
         }
 
     }
+
     @SuppressLint("WrongConstant")
     public void replaceFragment(Fragment fragment, String backstack_name) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -142,99 +162,71 @@ public class Parenting extends Fragment implements ParentAuthListner {
         fragmentTransaction.addToBackStack(backstack_name);
         fragmentTransaction.commit();
     }
-    private void hitApi() {
-        String id_language = "en-US";
-        String id_module = "m002,m003,m004,m006,m005,m001";
-        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9lYXAiOiIxNjUxIiwiaWRfY29tcGFueSI6MTY1MTI2NTY3fQ.FznzxAPBbFF9kI2Vd6G39P6kO431dztk8TN9VYir-jY";
-        String api_id = "1651";
-        if (Global.isOnline(getActivity())) {
-            userViewModel.hitParentDetails(id_language, id_module, token, api_id, this);
-        }
-
-
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         text_toolbar.setText("PARENTING");
+
     }
 
-    @Override
-    public void onStarted() {
+
+    void getSectionResponse() {
         progressDialog.show();
-    }
-
-    @Override
-    public void onOrderSuccess(LiveData<ParentReponse> data) {
-        progressDialog.dismiss();
-        data.observe(getActivity(), new Observer<ParentReponse>() {
+        ApiInterface networkService = ApiInterfaceService.getClient().create(ApiInterface.class);
+        Call<ListResponse<SectionModel>> arrayListCall = networkService.Modulelist(
+                "en-US",
+                "m002,m003,m004,m006,m005,m001",
+//               R.string.apitoken,
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9lYXAiOiIxNjUxIiwiaWRfY29tcGFueSI6MTY1MTI2NTY3fQ.FznzxAPBbFF9kI2Vd6G39P6kO431dztk8TN9VYir-jY",
+                "1651"
+        );
+        arrayListCall.enqueue(new Callback<ListResponse<SectionModel>>() {
             @Override
-            public void onChanged(ParentReponse parentReponse) {
-                //         adapter.update(parentReponse.getList_parent());
-            }
-        });
-
-    }
-
-    @Override
-    public void onFailure(String message) {
-        progressDialog.dismiss();
-        Global.msgDialog(getActivity(), message);
-
-    }
-
-    private void get_list() {
-        String id_language = "en-US";
-        String id_module = "m002,m003,m004,m006,m005,m001";
-        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9lYXAiOiIxNjUxIiwiaWRfY29tcGFueSI6MTY1MTI2NTY3fQ.FznzxAPBbFF9kI2Vd6G39P6kO431dztk8TN9VYir-jY";
-        String api_id = "1651";
-        progressDialog = Global.getProgressDialog(getActivity(), "Please wait...");
-        queue = Volley.newRequestQueue(getContext());
-        final JSONObject json = new JSONObject();
-        try {
-
-            json.put("id_language", id_language);
-            json.put("id_module", id_module);
-            json.put("token", token);
-            json.put("api_id", api_id);
-
-            Log.e("eventList", String.valueOf(json));
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        progressDialog.show();
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.POST, "https://www.powerflexweb.com/api_content/common/read_mod.php/", json,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        progressDialog.dismiss();
-                        Log.e("login reponse", "" + response);
-                        try {
-                            JSONObject jsonObject = new JSONObject(response.toString());
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
+            public void onResponse(@NonNull Call<ListResponse<SectionModel>> call, @NonNull Response<ListResponse<SectionModel>> response) {
                 progressDialog.dismiss();
-                Global.msgDialog(getActivity(), "Internet connection is slow");
+                if (!response.isSuccessful()) {
+                    switch (response.code()) {
+                        case 404:
+                            Global.showToast(getActivity(), "not found");
+                            break;
+                        case 500:
+                            Global.showToast(getActivity(), "server broken");
+                            break;
+                        default:
+                            Global.showToast(getActivity(), "unknown error");
+                            break;
+                    }
+                }
+                ListResponse<SectionModel> loginResponse = response.body();
+                if (loginResponse != null) {
+                    list = new ArrayList<>();
+                    list = loginResponse.getList();
+                    if (list.size() > 0 && list != null) {
+                        adapter.update(list);
+                    } else {
+                        rv_parent_list.setVisibility(View.GONE);
+                        not_found.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    Global.showToast(getActivity(), "No data Found");
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ListResponse<SectionModel>> call, @NonNull Throwable t) {
+                progressDialog.dismiss();
+//                login_btn.setClickable(true);
             }
         });
-        int socketTimeout = 30000;
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjectRequest.setRetryPolicy(policy);
-        queue.add(jsonObjectRequest);
+
     }
+
+
     @OnClick(R.id.iv_back)
-    public  void onClick(){
+    public void onClick() {
         getActivity().onBackPressed();
     }
 }
