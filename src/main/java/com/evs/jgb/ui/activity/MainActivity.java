@@ -49,6 +49,8 @@ import java.util.LinkedHashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.evs.jgb.ui.fragment.ArticleDetailsFragment.BUNDLE_KEY;
+
 public class MainActivity extends AppCompatActivity {
 
     FragmentManager manager;
@@ -168,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void updatedisplay(int position) {
         Fragment fragment = null;
+        Bundle bundle=new Bundle();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -179,23 +182,28 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 1:
                 fragment = new Parenting();
+                bundle.putString(BUNDLE_KEY, "PARENTING");
                 loadMainFragment(fragment, true);
                 break;
             case 2:
                 fragment = new AgingFragment();
+                bundle.putString(BUNDLE_KEY, "AGING");
                 loadMainFragment(fragment, true);
 
                 break;
             case 3:
                 fragment = new BalancingFragment();
+                bundle.putString(BUNDLE_KEY, "BALANCING");
                 loadMainFragment(fragment, true);
                 break;
             case 4:
                 fragment = new ThrivingFragment();
+                bundle.putString(BUNDLE_KEY, "THRIVING");
                 loadMainFragment(fragment, true);
                 break;
             case 5:
                 fragment = new WorkingFragment();
+                bundle.putString(BUNDLE_KEY, "WORKING");
                 loadMainFragment(fragment, true);
                 break;
             case 6:
@@ -262,16 +270,16 @@ public class MainActivity extends AppCompatActivity {
     private void nevigationlist() {
         LinkedHashMap<String, Integer> data = new LinkedHashMap<>();
         data.put(getResources().getString(R.string.home), R.drawable.home);
-        data.put(getResources().getString(R.string.parenting), R.drawable.note2);
-        data.put(getResources().getString(R.string.aging), R.drawable.note2);
-        data.put(getResources().getString(R.string.balancing), R.drawable.note2);
-        data.put(getResources().getString(R.string.thriving), R.drawable.note2);
-        data.put(getResources().getString(R.string.working), R.drawable.note2);
-        data.put(getResources().getString(R.string.living), R.drawable.note2);
-        data.put(getResources().getString(R.string.international), R.drawable.note2);
+        data.put(getResources().getString(R.string.parenting), R.drawable.parenting);
+        data.put(getResources().getString(R.string.aging), R.drawable.aging);
+        data.put(getResources().getString(R.string.balancing), R.drawable.balancing);
+        data.put(getResources().getString(R.string.thriving), R.drawable.thriving);
+        data.put(getResources().getString(R.string.working), R.drawable.working);
+        data.put(getResources().getString(R.string.living), R.drawable.living);
+        data.put(getResources().getString(R.string.international), R.drawable.ic_internet);
         data.put(getResources().getString(R.string.help), R.drawable.help);
-        data.put(getResources().getString(R.string.privacy_policy), R.drawable.note2);
-        data.put(getResources().getString(R.string.terms_of_use), R.drawable.help);
+        data.put(getResources().getString(R.string.privacy_policy), R.drawable.ic_privacy);
+        data.put(getResources().getString(R.string.terms_of_use), R.drawable.ic_terms);
         data.put(getResources().getString(R.string.logout), R.drawable.logout);
         list_adapter = new NevigationListAdapter(MainActivity.this, data);
         list_nav.setAdapter(list_adapter);

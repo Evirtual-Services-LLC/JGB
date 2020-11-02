@@ -32,5 +32,7 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms_of_use">Terms Of Use</string>
     <string name="action_search">Search Here</string>
+    <string name="tab_center">Center</string>
+    <string name="tab_categories">Categories</string>
 
 </resources>

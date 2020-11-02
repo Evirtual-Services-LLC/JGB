@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.RequestQueue;
+import com.bumptech.glide.Glide;
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.ParentListAdapter;
 import com.evs.jgb.model.SectionModel;
@@ -30,6 +31,7 @@ import com.evs.jgb.retrofit.ListResponse;
 import com.evs.jgb.ui.activity.MainActivity;
 import com.evs.jgb.utils.Global;
 import com.evs.jgb.viewModels.UserViewModel;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -41,8 +43,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_FULL;
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_TEMP;
+import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_DIVISION;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_MODULE;
+import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_TEXT;
 
 public class International extends Fragment {
     @BindView(R.id.text_toolbar)
@@ -60,8 +66,13 @@ public class International extends Fragment {
     RequestQueue queue;
     ParentListAdapter adapter;
     private ArrayList<SectionModel> list;
+    private ArrayList<SectionModel> temp_list;
+    private ArrayList<SectionModel> list_full=new ArrayList<>();
 
-
+    //set image toolbar
+    private String bundle_text;
+    @BindView(R.id.iv_module)
+    ImageView iv_module;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -72,28 +83,51 @@ public class International extends Fragment {
     }
 
     private void intialize() {
-        progressDialog = Global.getProgress(getActivity(), "Please wait...");
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
-        adapter = new ParentListAdapter(getActivity());
-        getSectionResponse();
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
-        rv_parent_list.setLayoutManager(manager);
-        rv_parent_list.setAdapter(adapter);
-        adapter.setOnClickListener((adapter, position) -> {
-            SectionModel model = adapter.get(position);
-            String devision_id = adapter.get(position).getId_division();
-            String module_id = adapter.get(position).getId_module();
-            goTonextScreen(position, devision_id, module_id);
-        });
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            bundle_text = bundle.getString(BUNDLE_TEXT);
+            if (bundle_text.equalsIgnoreCase("INTERNATIONAL")) {
+                iv_module.setVisibility(View.VISIBLE);
+                Glide.with(getActivity()).load(R.drawable.ic_internet).into(iv_module);
+            }
+
+//        list_full=new ArrayList<>();
+//        list_full = bundle.getParcelableArrayList(BUNDLE_LIST_FULL);
+//
+//    }if (list_full != null && list_full.size() > 0) {
+//        adapter.update(list_full);
+//    } else {
+        }
+            progressDialog = Global.getProgress(getActivity(), "Please wait...");
+            prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
+            adapter = new ParentListAdapter(getActivity());
+            getSectionResponse();
+            RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
+            rv_parent_list.setLayoutManager(manager);
+            rv_parent_list.setAdapter(adapter);
+            adapter.setOnClickListener((adapter, position) -> {
+                SectionModel model = adapter.get(position);
+                String devision_id = adapter.get(position).getId_division();
+                String module_id = adapter.get(position).getId_module();
+                goTonextScreen(position, devision_id, module_id, model);
+            });
+
     }
 
-    private void goTonextScreen(int position, String devision_id, String module_id) {
-
+    private void goTonextScreen(int position, String devision_id, String module_id, SectionModel model) {
+        temp_list=new ArrayList<>();
+        temp_list=list;
+        temp_list.remove(position);
         Bundle bundle = new Bundle();
-        Fragment fragment = new ParentingNew();
+        Fragment fragment = new TabsFragment();
         bundle.putString(BUNDLE_ID_DIVISION, devision_id);
+        bundle.putString(BUNDLE_TEXT, "INTERNATIONAL");
         bundle.putString(BUNDLE_ID_MODULE, module_id);
+        bundle.putString(BUNDLE_KEY_DETAILS, new Gson().toJson(model));
+        bundle.putParcelableArrayList(BUNDLE_LIST_TEMP, temp_list);
+        bundle.putParcelableArrayList(BUNDLE_LIST_FULL, list);
+
         fragment.setArguments(bundle);
         Activity activity = getActivity();
         if (activity instanceof MainActivity) {

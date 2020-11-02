@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.AgingAdapter;
 import com.evs.jgb.model.AgingModel;
@@ -39,9 +41,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_FULL;
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_TEMP;
 import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
+import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_CATEGORY;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_DIVISION;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_MODULE;
+import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_TEXT;
 
 public class ThrivingFragment extends Fragment {
     @BindView(R.id.not_found)
@@ -51,9 +57,14 @@ public class ThrivingFragment extends Fragment {
     @BindView(R.id.rv_thriving_list)
     RecyclerView rv_thriving_list;
     AgingAdapter adapter;
-    private ArrayList<AgingModel> list;
     ACProgressFlower progressDialog;
-
+    private ArrayList<SectionModel> list;
+    private ArrayList<SectionModel> temp_list;
+    private ArrayList<SectionModel> list_full=new ArrayList<>();
+    //set image toolbar
+    private String bundle_text;
+    @BindView(R.id.iv_module)
+    ImageView iv_module;
     @SuppressLint("ResourceType")
     @Nullable
     @Override
@@ -61,31 +72,34 @@ public class ThrivingFragment extends Fragment {
         View view = inflater.inflate(R.layout.frag_thriving, container, false);
         ButterKnife.bind(this, view);
         progressDialog = Global.getProgress(getActivity(), "Please wait...");
-        getSectionResponse();
-//        list = new ArrayList<>();
-//        list.add(new AgingModel("1", " Health Tools", getString(R.drawable.note1)));
-//        list.add(new AgingModel("2", " Live Healthy", getString(R.drawable.music)));
-//        list.add(new AgingModel("3", "Healthy Eating", getString(R.drawable.study)));
-//        list.add(new AgingModel("4", "Healthy Recipes", getString(R.drawable.note2)));
-//        list.add(new AgingModel("5", "Medical Care", getString(R.drawable.study2)));
-//        list.add(new AgingModel("6", "Infants' and Toddlers' Health", getString(R.drawable.care)));
-//        list.add(new AgingModel("7", "Children's Health", getString(R.drawable.care)));
-//        list.add(new AgingModel("8", "Adolescents' Health", getString(R.drawable.care)));
-//        list.add(new AgingModel("9", "Women's Health", getString(R.drawable.care)));
-//        list.add(new AgingModel("10", "Men's Health", getString(R.drawable.care)));
-//        list.add(new AgingModel("11", "Seniors' Health", getString(R.drawable.care)));
-//        list.add(new AgingModel("12", "Health Challenges", getString(R.drawable.care)));
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            bundle_text = bundle.getString(BUNDLE_TEXT);
+            if (bundle_text.equalsIgnoreCase("THRIVING")) {
+                iv_module.setVisibility(View.VISIBLE);
+                Glide.with(getActivity()).load(R.drawable.thriving).into(iv_module);
+            }
+//            list_full=new ArrayList<>();
+//            list_full = bundle.getParcelableArrayList(BUNDLE_LIST_FULL);
+//
+//        }if (list_full != null && list_full.size() > 0) {
+//            adapter.update(list_full);
+//        } else {
+        }
 
-        adapter = new AgingAdapter(getActivity());
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
-        rv_thriving_list.setLayoutManager(manager);
-        rv_thriving_list.setAdapter(adapter);
-        adapter.setOnClickListener((adapter, position) -> {
-            SectionModel model = adapter.get(position);
-            String devision_id = adapter.get(position).getId_division();
-            String module_id = adapter.get(position).getId_module();
-            goTonextScreen(position, devision_id, module_id,model);
-        });
+            getSectionResponse();
+
+            adapter = new AgingAdapter(getActivity());
+            RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
+            rv_thriving_list.setLayoutManager(manager);
+            rv_thriving_list.setAdapter(adapter);
+            adapter.setOnClickListener((adapter, position) -> {
+                SectionModel model = adapter.get(position);
+                String devision_id = adapter.get(position).getId_division();
+                String module_id = adapter.get(position).getId_module();
+                goTonextScreen(position, devision_id, module_id, model);
+            });
+
         return view;
     }
     void getSectionResponse() {
@@ -116,8 +130,10 @@ public class ThrivingFragment extends Fragment {
                     }
                 }
                 ListResponse<SectionModel> loginResponse = response.body();
-                if (loginResponse.getList().size() > 0 && loginResponse.getList() != null) {
-                    adapter.update(loginResponse.getList());
+                list = new ArrayList<>();
+                list = loginResponse.getList();
+                if (list.size() > 0 && list != null) {
+                    adapter.update(list);
                 } else {
                     rv_thriving_list.setVisibility(View.GONE);
                     not_found.setVisibility(View.VISIBLE);
@@ -135,11 +151,17 @@ public class ThrivingFragment extends Fragment {
 
     }
     private void goTonextScreen(int position, String devision_id, String module_id, SectionModel model) {
+        temp_list=new ArrayList<>();
+        temp_list=list;
+        temp_list.remove(position);
         Bundle bundle = new Bundle();
-        Fragment fragment = new ParentingNew();
+        Fragment fragment = new TabsFragment();
         bundle.putString(BUNDLE_ID_DIVISION, devision_id);
+        bundle.putString(BUNDLE_TEXT, "THRIVING");
         bundle.putString(BUNDLE_ID_MODULE, module_id);
         bundle.putString(BUNDLE_KEY_DETAILS, new Gson().toJson(model));
+        bundle.putParcelableArrayList(BUNDLE_LIST_TEMP, temp_list);
+        bundle.putParcelableArrayList(BUNDLE_LIST_FULL, list);
         fragment.setArguments(bundle);
         Activity activity = getActivity();
         if (activity instanceof MainActivity) {

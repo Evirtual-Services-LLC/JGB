@@ -4,12 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_dashboard_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar"
-        android:layout_margin="10dp" />
+
 
     <ScrollView
         android:layout_width="match_parent"
@@ -280,9 +275,53 @@
                 </LinearLayout>
 
             </LinearLayout>
-            
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            >
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="10dp"
+                android:orientation="vertical"
+                android:id="@+id/layoutHomeSeven"
+                >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_bg_green"
+                >
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:padding="25dp"
+                    android:id="@+id/dashboardImageSeven"
+                    />
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:fontFamily="@font/d_din_font"
+                android:id="@+id/textDashboardSeven"
+                android:padding="5dp"
+                android:text=""
+                android:gravity="center"
+                />
+            </LinearLayout>
+
         </LinearLayout>
-        
+
+
+        </LinearLayout>
+
     </ScrollView>
 
 </RelativeLayout>

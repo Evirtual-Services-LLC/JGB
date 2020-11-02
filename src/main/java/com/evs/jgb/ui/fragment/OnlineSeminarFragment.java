@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.ArticleListAdapter;
 import com.evs.jgb.adapter.AudioAdapter;
+import com.evs.jgb.model.SectionModel;
 import com.evs.jgb.model.parentModel.ArticleModel;
 import com.evs.jgb.model.parentModel.ArticleModel;
 import com.evs.jgb.retrofit.ApiInterface;
@@ -46,6 +47,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.evs.jgb.ui.fragment.ArticleDetailsFragment.BUNDLE_KEY;
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_TEMP;
 import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_DIVISION;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_MODULE;
@@ -66,6 +68,7 @@ public class OnlineSeminarFragment extends Fragment {
     TextView not_found;
     ACProgressFlower progressDialog;
     String module_id, devision_id;
+    private ArrayList<SectionModel> temp_list=new ArrayList<>();
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_audio, container, false);
         ButterKnife.bind(this, view);
@@ -84,6 +87,7 @@ public class OnlineSeminarFragment extends Fragment {
         if (bundle != null) {
             devision_id = bundle.getString(BUNDLE_ID_DIVISION);
             module_id = bundle.getString(BUNDLE_ID_MODULE);
+            temp_list=bundle.getParcelableArrayList(BUNDLE_LIST_TEMP);
         }
         getSectionResponse();
 //        list.add(new ArticleModel("1", "Being an upstander"));

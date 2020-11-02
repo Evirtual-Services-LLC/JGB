@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.AgingAdapter;
 import com.evs.jgb.model.AgingModel;
@@ -42,9 +44,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_FULL;
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_TEMP;
 import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_DIVISION;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_MODULE;
+import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_TEXT;
 
 public class AgingFragment extends Fragment {
 
@@ -56,14 +61,31 @@ public class AgingFragment extends Fragment {
     RecyclerView rv_agening_list;
     AgingAdapter adapter;
     ACProgressFlower progressDialog;
+    private ArrayList<SectionModel> list;
+    private ArrayList<SectionModel> temp_list=new ArrayList<>();
+    private ArrayList<SectionModel> list_full=new ArrayList<>();
+    //set image toolbar
+    private String bundle_text;
+    @BindView(R.id.iv_module)
+    ImageView iv_module;
     @SuppressLint("ResourceType")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_aging, container, false);
         ButterKnife.bind(this, view);
-        progressDialog = Global.getProgress(getActivity(), "Please wait...");
-        getSectionResponse();
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            bundle_text = bundle.getString(BUNDLE_TEXT);
+            if (bundle_text.equalsIgnoreCase("AGING")) {
+                iv_module.setVisibility(View.VISIBLE);
+                Glide.with(getActivity()).load(R.drawable.aging).into(iv_module);
+            }
+
+
+        }
+            progressDialog = Global.getProgress(getActivity(), "Please wait...");
+            getSectionResponse();
 //        list = new ArrayList<>();
 //        list.add(new AgingModel("1", "Adults With Disabilities", ""));
 //        list.add(new AgingModel("2", "Aging Well", ""));
@@ -72,16 +94,16 @@ public class AgingFragment extends Fragment {
 //        list.add(new AgingModel("5", "Housing Option", ""));
 //        list.add(new AgingModel("6", "Home Care", ""));
 
-        adapter = new AgingAdapter(getActivity());
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
-        rv_agening_list.setLayoutManager(manager);
-        rv_agening_list.setAdapter(adapter);
-        adapter.setOnClickListener((adapter, position) -> {
-            SectionModel model = adapter.get(position);
-            String devision_id = adapter.get(position).getId_division();
-            String module_id = adapter.get(position).getId_module();
-            goTonextScreen(position, devision_id, module_id,model);
-        });
+            adapter = new AgingAdapter(getActivity());
+            RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
+            rv_agening_list.setLayoutManager(manager);
+            rv_agening_list.setAdapter(adapter);
+            adapter.setOnClickListener((adapter, position) -> {
+                SectionModel model = adapter.get(position);
+                String devision_id = adapter.get(position).getId_division();
+                String module_id = adapter.get(position).getId_module();
+                goTonextScreen(position, devision_id, module_id, model);
+            });
 
 
         return view;
@@ -92,7 +114,7 @@ public class AgingFragment extends Fragment {
         ApiInterface networkService = ApiInterfaceService.getClient().create(ApiInterface.class);
         Call<ListResponse<SectionModel>> arrayListCall = networkService.Modulelist(
                 "en-US",
-                "m007,m008,m014,m015,m012,m011,m009",
+                "m007,m008,m014,m010,m015,m013,m012,m011,m009",
 //               R.string.apitoken,
                 "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9lYXAiOiIxNjUxIiwiaWRfY29tcGFueSI6MTY1MTI2NTY3fQ.FznzxAPBbFF9kI2Vd6G39P6kO431dztk8TN9VYir-jY",
                 "1651"
@@ -115,8 +137,11 @@ public class AgingFragment extends Fragment {
                     }
                 }
                 ListResponse<SectionModel> loginResponse = response.body();
-                if (loginResponse.getList().size() > 0 && loginResponse.getList() != null) {
-                    adapter.update(loginResponse.getList());
+
+                list = new ArrayList<>();
+                list = loginResponse.getList();
+                if (list.size() > 0 && list != null) {
+                    adapter.update(list);
                 } else {
                     rv_agening_list.setVisibility(View.GONE);
                     not_found.setVisibility(View.VISIBLE);
@@ -135,11 +160,17 @@ public class AgingFragment extends Fragment {
     }
 
     private void goTonextScreen(int position, String devision_id, String module_id, SectionModel model) {
+        temp_list=new ArrayList<>();
+        temp_list=list;
+        temp_list.remove(position);
         Bundle bundle = new Bundle();
-        Fragment fragment = new ParentingNew();
+        Fragment fragment = new TabsFragment();
         bundle.putString(BUNDLE_ID_DIVISION, devision_id);
         bundle.putString(BUNDLE_ID_MODULE, module_id);
+        bundle.putString(BUNDLE_TEXT, "AGING");
         bundle.putString(BUNDLE_KEY_DETAILS, new Gson().toJson(model));
+        bundle.putParcelableArrayList(BUNDLE_LIST_TEMP, temp_list);
+        bundle.putParcelableArrayList(BUNDLE_LIST_FULL, list);
         fragment.setArguments(bundle);
         Activity activity = getActivity();
         if (activity instanceof MainActivity) {

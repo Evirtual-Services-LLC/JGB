@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,16 +20,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.MyViewHolder> implements Filterable {
+public class ArticleDetailAdapter extends RecyclerView.Adapter<ArticleDetailAdapter.MyViewHolder>  {
     private Context context;
     ArrayList<ArticleModel> list, originalData;
     private OnClickListener listener;
-    private ItemFilter mFilter = new ItemFilter();
+    private final int limit = 10;
+
     private static final int ITEM = 0;
     private static final int LOADING = 1;
     private boolean isLoadingAdded = false;
 
-    public ArticleListAdapter(Context context) {
+    public ArticleDetailAdapter(Context context) {
         this.context = context;
         this.list = new ArrayList<>();
         this.originalData = list;
@@ -63,8 +63,16 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     @Override
     public int getItemCount() {
-        return list.size();
+        if(list.size() >= limit){
+            return limit;
+        }
+        else
+        {
+            return list.size();
+        }
     }
+
+
 
     public void setOnClickListener(OnClickListener listener) {
         this.listener = listener;
@@ -75,7 +83,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
     }
 
     public interface OnClickListener {
-        void onClick(ArticleListAdapter adapter, int position);
+        void onClick(ArticleDetailAdapter adapter, int position);
 
     }
 
@@ -116,45 +124,6 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         notifyDataSetChanged();
     }
 
-    public Filter getFilter() {
-        return mFilter;
-    }
 
-    private class ItemFilter extends Filter {
-        @Override
-        public CharSequence convertResultToString(Object resultValue) {
-            String str = ((ArticleModel) resultValue).getTitle();
-            return str;
-        }
 
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            String filterString = constraint.toString().toLowerCase();
-            FilterResults results = new FilterResults();
-            final List<ArticleModel> list = originalData;
-
-            int count = list.size();
-            final ArrayList<ArticleModel> nlist = new ArrayList<>(count);
-            String filterableString;
-
-            for (int i = 0; i < count; i++) {
-                filterableString = (list.get(i).getTitle());
-                if (filterableString.toLowerCase().contains(filterString)) {
-                    nlist.add(list.get(i));
-                }
-            }
-            results.values = nlist;
-            results.count = nlist.size();
-            return results;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            list = (ArrayList<ArticleModel>) results.values;
-            notifyDataSetChanged();
-
-        }
-
-    }
 }

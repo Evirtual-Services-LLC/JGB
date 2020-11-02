@@ -1,5 +1,6 @@
 package com.evs.jgb.retrofit;
 
+import com.evs.jgb.model.CategoryModel;
 import com.evs.jgb.model.ParentReponse;
 import com.evs.jgb.model.SectionModel;
 import com.evs.jgb.model.parentModel.ArticleModel;
@@ -86,5 +87,15 @@ public interface ApiInterface {
             @Field("token") String token,
             @Field("api_id") String api_id
     );
+
+    @FormUrlEncoded
+    @POST("read_mod_cat.php")
+    Call<ListResponse<CategoryModel>> categoryList(
+            @Field("id_language") String id_language,
+            @Field("id_module") String module_id,
+            @Field("token") String token,
+            @Field("api_id") String api_id
+    );
+
 
 }

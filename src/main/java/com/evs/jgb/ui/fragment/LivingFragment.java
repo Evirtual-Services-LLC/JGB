@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.AgingAdapter;
 import com.evs.jgb.model.AgingModel;
@@ -39,9 +41,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_FULL;
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_TEMP;
 import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_DIVISION;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_MODULE;
+import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_TEXT;
 
 public class LivingFragment extends Fragment {
     @BindView(R.id.not_found)
@@ -51,31 +56,38 @@ public class LivingFragment extends Fragment {
     @BindView(R.id.rv_living_list)
     RecyclerView rv_living_list;
     AgingAdapter adapter;
-
+    private ArrayList<SectionModel> list;
+    private ArrayList<SectionModel> temp_list;
     ACProgressFlower progressDialog;
+    private ArrayList<SectionModel> list_full = new ArrayList<>();
+    //set image toolbar
+    private String bundle_text;
+    @BindView(R.id.iv_module)
+    ImageView iv_module;
+
     @SuppressLint("ResourceType")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_living, container, false);
         ButterKnife.bind(this, view);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            bundle_text = bundle.getString(BUNDLE_TEXT);
+            if (bundle_text.equalsIgnoreCase("LIVING")) {
+                iv_module.setVisibility(View.VISIBLE);
+                Glide.with(getActivity()).load(R.drawable.living).into(iv_module);
+            }
+//            list_full=new ArrayList<>();
+//            list_full = bundle.getParcelableArrayList(BUNDLE_LIST_FULL);
+//
+//        }if (list_full != null && list_full.size() > 0) {
+//            adapter.update(list_full);
+//        } else {
+        }
+
         progressDialog = Global.getProgress(getActivity(), "Please wait...");
         getSectionResponse();
-//        list = new ArrayList<>();
-//        list.add(new AgingModel("1", "Comsumer Tips", getString(R.drawable.note1)));
-//        list.add(new AgingModel("2", "Home Improvement", getString(R.drawable.music)));
-//        list.add(new AgingModel("3", "Home Buying or Selling", getString(R.drawable.study)));
-//        list.add(new AgingModel("4", "Moving", getString(R.drawable.note2)));
-//        list.add(new AgingModel("5", "Financial", getString(R.drawable.study2)));
-//        list.add(new AgingModel("6", "Legal", getString(R.drawable.care)));
-//        list.add(new AgingModel("7", "Legal Forms", getString(R.drawable.care)));
-//        list.add(new AgingModel("8", "Erronds Online", getString(R.drawable.care)));
-//        list.add(new AgingModel("9", "Safety", getString(R.drawable.care)));
-//        list.add(new AgingModel("10", "Pets", getString(R.drawable.care)));
-//        list.add(new AgingModel("11", "Travel and Leisure Time", getString(R.drawable.care)));
-//        list.add(new AgingModel("12", "Fraud and Theft", getString(R.drawable.care)));
-//        list.add(new AgingModel("13", "Go Green", getString(R.drawable.care)));
-
         adapter = new AgingAdapter(getActivity());
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
         rv_living_list.setLayoutManager(manager);
@@ -84,11 +96,12 @@ public class LivingFragment extends Fragment {
             SectionModel model = adapter.get(position);
             String devision_id = adapter.get(position).getId_division();
             String module_id = adapter.get(position).getId_module();
-            goTonextScreen(position, devision_id, module_id,model);
+            goTonextScreen(position, devision_id, module_id, model);
         });
 
-return view;
+        return view;
     }
+
     void getSectionResponse() {
         progressDialog.show();
         ApiInterface networkService = ApiInterfaceService.getClient().create(ApiInterface.class);
@@ -117,8 +130,10 @@ return view;
                     }
                 }
                 ListResponse<SectionModel> loginResponse = response.body();
-                if (loginResponse.getList().size() > 0 && loginResponse.getList() != null) {
-                    adapter.update(loginResponse.getList());
+                list = new ArrayList<>();
+                list = loginResponse.getList();
+                if (list.size() > 0 && list != null) {
+                    adapter.update(list);
                 } else {
                     rv_living_list.setVisibility(View.GONE);
                     not_found.setVisibility(View.VISIBLE);
@@ -135,12 +150,19 @@ return view;
         });
 
     }
+
     private void goTonextScreen(int position, String devision_id, String module_id, SectionModel model) {
+        temp_list = new ArrayList<>();
+        temp_list = list;
+        temp_list.remove(position);
         Bundle bundle = new Bundle();
-        Fragment fragment = new ParentingNew();
+        Fragment fragment = new TabsFragment();
         bundle.putString(BUNDLE_ID_DIVISION, devision_id);
+        bundle.putString(BUNDLE_TEXT, "LIVING");
         bundle.putString(BUNDLE_ID_MODULE, module_id);
         bundle.putString(BUNDLE_KEY_DETAILS, new Gson().toJson(model));
+        bundle.putParcelableArrayList(BUNDLE_LIST_TEMP, temp_list);
+        bundle.putParcelableArrayList(BUNDLE_LIST_FULL, list);
         fragment.setArguments(bundle);
         Activity activity = getActivity();
         if (activity instanceof MainActivity) {

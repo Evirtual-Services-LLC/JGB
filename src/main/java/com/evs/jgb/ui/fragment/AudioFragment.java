@@ -17,10 +17,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.ArticleListAdapter;
 import com.evs.jgb.adapter.AudioAdapter;
+import com.evs.jgb.adapter.CustomViewPagerAdapter;
 import com.evs.jgb.model.parentModel.ArticleModel;
 import com.evs.jgb.model.parentModel.AudioModel;
 import com.evs.jgb.retrofit.ApiInterface;
@@ -39,6 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_TEMP;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_DIVISION;
 import static com.evs.jgb.ui.fragment.Parenting.BUNDLE_ID_MODULE;
 
@@ -51,9 +54,6 @@ public class AudioFragment extends Fragment {
     ImageView iv_player;
     @BindView(R.id.rv_audio_list)
     RecyclerView rv_audio_list;
-    View includeLayout;
-    TextView listDataText;
-    ImageView listDataImg;
     ArrayList<ArticleModel> list;
     AudioAdapter adapter;
     String module_id, devision_id;
@@ -81,8 +81,9 @@ public class AudioFragment extends Fragment {
         if (bundle != null) {
             devision_id = bundle.getString(BUNDLE_ID_DIVISION);
             module_id = bundle.getString(BUNDLE_ID_MODULE);
+            list = bundle.getParcelableArrayList(BUNDLE_LIST_TEMP);
+            adapter.update(list);
         }
-        getSectionResponse();
 
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         rv_audio_list.setLayoutManager(manager);
@@ -116,54 +117,7 @@ public class AudioFragment extends Fragment {
         adapter.filterList(filteredList);
 
     }
-    void getSectionResponse() {
-        progressDialog.show();
-        ApiInterface networkService = ApiInterfaceService.getClient().create(ApiInterface.class);
-        Call<ListResponse<ArticleModel>> arrayListCall = networkService.ArticleModulelist(devision_id,module_id,"","001","","",
-                "en-us","id_cr,title,id_element","title","asc","","","",
-                ""  , "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9lYXAiOiIxNjUxIiwiaWRfY29tcGFueSI6MTY1MTI2NTY3fQ.FznzxAPBbFF9kI2Vd6G39P6kO431dztk8TN9VYir-jY",
-                "1651");
-        arrayListCall.enqueue(new Callback<ListResponse<ArticleModel>>() {
-            @Override
-            public void onResponse(@NonNull Call<ListResponse<ArticleModel>> call, @NonNull Response<ListResponse<ArticleModel>> response) {
-                progressDialog.dismiss();
-                if (!response.isSuccessful()) {
-                    switch (response.code()) {
-                        case 404:
-                            Global.showToast(getActivity(), "not found");
-                            break;
-                        case 500:
-                            Global.showToast(getActivity(), "server broken");
-                            break;
-                        default:
-                            Global.showToast(getActivity(), "unknown error");
 
-                    }
-                }
-                ListResponse<ArticleModel> loginResponse = response.body();
-                if(loginResponse!=null) {
-                    list = new ArrayList<>();
-                    list = loginResponse.getList();
-                    if (list.size() > 0 && list != null) {
-                        adapter.update(list);
-                    } else {
-                        rv_audio_list.setVisibility(View.GONE);
-                        not_found.setVisibility(View.VISIBLE);
-                    }
-                }else{
-                    Global.showToast(getActivity(),"No data Found");
-                }
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ListResponse<ArticleModel>> call, @NonNull Throwable t) {
-                progressDialog.dismiss();
-//                login_btn.setClickable(true);
-            }
-        });
-
-    }
     @Override
     public void onResume() {
         super.onResume();

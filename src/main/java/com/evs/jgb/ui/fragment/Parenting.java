@@ -2,11 +2,9 @@ package com.evs.jgb.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,37 +16,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.evs.jgb.R;
 import com.evs.jgb.adapter.ParentListAdapter;
-import com.evs.jgb.model.ParentReponse;
 import com.evs.jgb.model.SectionModel;
-import com.evs.jgb.model.parentModel.ParentModel;
 import com.evs.jgb.retrofit.ApiInterface;
 import com.evs.jgb.retrofit.ApiInterfaceService;
 import com.evs.jgb.retrofit.ListResponse;
-import com.evs.jgb.ui.activity.LoginActivity;
 import com.evs.jgb.ui.activity.MainActivity;
 import com.evs.jgb.utils.Global;
-import com.evs.jgb.viewModels.AuthListener;
-import com.evs.jgb.viewModels.ParentAuthListner;
 import com.evs.jgb.viewModels.UserViewModel;
 import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -60,17 +43,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_FULL;
+import static com.evs.jgb.ui.fragment.ArticleNewFragment.BUNDLE_LIST_TEMP;
 import static com.evs.jgb.ui.fragment.ArticlesFragment.BUNDLE_KEY_DETAILS;
 
 public class Parenting extends Fragment {
     public static final String BUNDLE_ID_DIVISION = "iddivision";
     public static final String BUNDLE_ID_MODULE = "idModule";
+    public static final String BUNDLE_ID_CATEGORY = "idCategory";
+    public static final String BUNDLE_TEXT = "text";
+    public static final String BUNDLE_SELECT_TEXT = "selectText";
     @BindView(R.id.text_toolbar)
     TextView text_toolbar;
     @BindView(R.id.not_found)
     TextView not_found;
     @BindView(R.id.rv_parent_list)
     RecyclerView rv_parent_list;
+    @BindView(R.id.iv_module)
+    ImageView iv_module;
     RelativeLayout layoutParentOne, layoutParentTwo, layoutParentThree;
     TextView textHomeOne, textHomeTwo, textHomeThree;
     ImageView imageHomeOne, imageHomeTwo, imageHomeThree;
@@ -80,6 +70,10 @@ public class Parenting extends Fragment {
     RequestQueue queue;
     ParentListAdapter adapter;
     private ArrayList<SectionModel> list;
+    private ArrayList<SectionModel> temp_list;
+    private ArrayList<SectionModel> list_full;
+    private String textName;
+
 
     @Nullable
     @Override
@@ -92,6 +86,17 @@ public class Parenting extends Fragment {
     }
 
     private void intialize() {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            textName = bundle.getString(BUNDLE_TEXT);
+            if (textName != null)
+                if (textName.equalsIgnoreCase("PARENTING")) {
+                    iv_module.setVisibility(View.VISIBLE);
+                    Glide.with(getActivity()).load(R.drawable.parenting).into(iv_module);
+                }
+          //  list_full = bundle.getParcelableArrayList(BUNDLE_LIST_FULL);
+
+        }
         progressDialog = Global.getProgress(getActivity(), "Please wait...");
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
@@ -106,45 +111,21 @@ public class Parenting extends Fragment {
             String module_id = adapter.get(position).getId_module();
             goTonextScreen(position, devision_id, module_id, model);
         });
-//        if (Global.isOnline(getActivity())) {
-//            userViewModel.hitParentDivision(this);
-//        }
-//        userViewModel.getDivisionData().observe(getActivity(), new Observer<ArrayList<SectionModel>>() {
-//            @Override
-//            public void onChanged(ArrayList<SectionModel> addressModels) {
-//                progressDialog.dismiss();
-//                if (addressModels != null && addressModels.size() > 0) {
-//                    adapter.update(addressModels);
-//                } else {
-//                    rv_parent_list.setVisibility(View.GONE);
-//                    not_found.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        });
-
-//        list = new ArrayList<>();
-//        list.add(new ParentModel("1", "Parenting", R.drawable.parent_two));
-//        list.add(new ParentModel("2", "Aging", R.drawable.aging_two));
-//        list.add(new ParentModel("3", "Balancing", R.drawable.balance_two));
-//        list.add(new ParentModel("4", "Thriving", R.drawable.thriving_two));
-//        list.add(new ParentModel("5", "Working", R.drawable.working_two));
-//        list.add(new ParentModel("6", "Living", R.drawable.living_two));
-//        progressDialog = Global.getProgressDialog(getActivity(), "Please wait...");
-//        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
-//
-//        adapter = new ParentListAdapter(getActivity(), list);
-
 
     }
 
     private void goTonextScreen(int position, String devision_id, String module_id, SectionModel model) {
-
+        temp_list = new ArrayList<>();
+        temp_list = list;
+        temp_list.remove(position);
         Bundle bundle = new Bundle();
-        Fragment fragment = new ParentingNew();
+        Fragment fragment = new TabsFragment();
         bundle.putString(BUNDLE_ID_DIVISION, devision_id);
         bundle.putString(BUNDLE_ID_MODULE, module_id);
+        bundle.putString(BUNDLE_TEXT, "PARENTING");
         bundle.putString(BUNDLE_KEY_DETAILS, new Gson().toJson(model));
+        bundle.putParcelableArrayList(BUNDLE_LIST_FULL, list);
+        bundle.putParcelableArrayList(BUNDLE_LIST_TEMP, temp_list);
         fragment.setArguments(bundle);
         Activity activity = getActivity();
         if (activity instanceof MainActivity) {

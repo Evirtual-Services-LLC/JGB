@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.evs.jgb.model.ParentReponse;
 import com.evs.jgb.model.SectionModel;
+import com.evs.jgb.model.parentModel.ArticleModel;
 import com.evs.jgb.retrofit.ApiInterface;
 import com.evs.jgb.retrofit.ApiInterfaceService;
 import com.evs.jgb.retrofit.ListResponse;
@@ -207,7 +208,8 @@ public class Repository {
                 });
 
 
-    }public void executeLivingParenting( final AuthListener authListener) {
+    }
+    public void executeLivingParenting( final AuthListener authListener) {
         //noinspection NullableProblems
         ApiInterfaceService.getClient().create(ApiInterface.class).Modulelist("en-US",
                 "m312,m319,m316,m323,m451,m314,m313,m317,m318,m315,m321,m320,m322",
@@ -242,9 +244,13 @@ public class Repository {
                     }
                 });
 
-
     }
 
-
+    public   Call<ListResponse<ArticleModel>> executeUploadProfile(String devision_id,String module_id) {
+        return ApiInterfaceService.getApiService().ArticleModulelist(devision_id, module_id, "", "001", "", "",
+                "en-us", "id_cr,title,id_element,body_combine", "title", "asc", "", "", "",
+                "", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9lYXAiOiIxNjUxIiwiaWRfY29tcGFueSI6MTY1MTI2NTY3fQ.FznzxAPBbFF9kI2Vd6G39P6kO431dztk8TN9VYir-jY",
+                "1651");
+    }
 
 }

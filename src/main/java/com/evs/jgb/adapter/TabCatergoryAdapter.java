@@ -6,13 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.evs.jgb.R;
+import com.evs.jgb.model.CategoryModel;
 import com.evs.jgb.model.parentModel.ArticleModel;
 
 import java.util.ArrayList;
@@ -21,16 +21,15 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.MyViewHolder> implements Filterable {
+public class TabCatergoryAdapter extends RecyclerView.Adapter<TabCatergoryAdapter.MyViewHolder> {
     private Context context;
-    ArrayList<ArticleModel> list, originalData;
+    ArrayList<CategoryModel> list, originalData;
     private OnClickListener listener;
-    private ItemFilter mFilter = new ItemFilter();
     private static final int ITEM = 0;
     private static final int LOADING = 1;
     private boolean isLoadingAdded = false;
 
-    public ArticleListAdapter(Context context) {
+    public TabCatergoryAdapter(Context context) {
         this.context = context;
         this.list = new ArrayList<>();
         this.originalData = list;
@@ -40,13 +39,13 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.article_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.myadd_list_item, parent, false);
         return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.tv_product_name.setText(list.get(position).getTitle());
+        holder.tv_product_name.setText(list.get(position).getNative_term());
         holder.setOnClickListener(position1 -> {
             if (listener != null) {
                 listener.onClick(this, position1);
@@ -55,7 +54,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     }
 
-    public void update(List<ArticleModel> category) {
+    public void update(List<CategoryModel> category) {
         this.list.clear();
         this.list.addAll(category);
         notifyDataSetChanged();
@@ -70,16 +69,16 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         this.listener = listener;
     }
 
-    public void add(List<ArticleModel> bootData) {
+    public void add(List<CategoryModel> bootData) {
         this.list.addAll(bootData);
     }
 
     public interface OnClickListener {
-        void onClick(ArticleListAdapter adapter, int position);
+        void onClick(TabCatergoryAdapter adapter, int position);
 
     }
 
-    public ArticleModel get(int position) {
+    public CategoryModel get(int position) {
         return list.get(position);
     }
 
@@ -111,50 +110,6 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         }
     }
 
-    public void filterList(ArrayList<ArticleModel> filteredList) {
-        list = filteredList;
-        notifyDataSetChanged();
-    }
 
-    public Filter getFilter() {
-        return mFilter;
-    }
 
-    private class ItemFilter extends Filter {
-        @Override
-        public CharSequence convertResultToString(Object resultValue) {
-            String str = ((ArticleModel) resultValue).getTitle();
-            return str;
-        }
-
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            String filterString = constraint.toString().toLowerCase();
-            FilterResults results = new FilterResults();
-            final List<ArticleModel> list = originalData;
-
-            int count = list.size();
-            final ArrayList<ArticleModel> nlist = new ArrayList<>(count);
-            String filterableString;
-
-            for (int i = 0; i < count; i++) {
-                filterableString = (list.get(i).getTitle());
-                if (filterableString.toLowerCase().contains(filterString)) {
-                    nlist.add(list.get(i));
-                }
-            }
-            results.values = nlist;
-            results.count = nlist.size();
-            return results;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            list = (ArrayList<ArticleModel>) results.values;
-            notifyDataSetChanged();
-
-        }
-
-    }
 }

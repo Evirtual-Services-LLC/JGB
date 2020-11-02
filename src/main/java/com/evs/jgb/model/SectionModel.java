@@ -1,14 +1,19 @@
 package com.evs.jgb.model;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 
-public class SectionModel {
+public class SectionModel implements Parcelable {
 
 //       "id_module": "m007",
     //        "name_module": "Adults With Disabilities",
 //        "native_term": "Adults With Disabilities",
 //        "id_division": "d02",
 //        "name_division": "Aging"
+
+    boolean isClick=false;
     @SerializedName("id_module")
     private String id_module;
 
@@ -23,6 +28,27 @@ public class SectionModel {
 
     @SerializedName("name_division")
     private String name_division;
+
+    protected SectionModel(Parcel in) {
+        isClick = in.readByte() != 0;
+        id_module = in.readString();
+        name_module = in.readString();
+        native_term = in.readString();
+        id_division = in.readString();
+        name_division = in.readString();
+    }
+
+    public static final Creator<SectionModel> CREATOR = new Creator<SectionModel>() {
+        @Override
+        public SectionModel createFromParcel(Parcel in) {
+            return new SectionModel(in);
+        }
+
+        @Override
+        public SectionModel[] newArray(int size) {
+            return new SectionModel[size];
+        }
+    };
 
     public String getId_module() {
         return id_module;
@@ -62,5 +88,20 @@ public class SectionModel {
 
     public void setName_division(String name_division) {
         this.name_division = name_division;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (isClick ? 1 : 0));
+        dest.writeString(id_module);
+        dest.writeString(name_module);
+        dest.writeString(native_term);
+        dest.writeString(id_division);
+        dest.writeString(name_division);
     }
 }
